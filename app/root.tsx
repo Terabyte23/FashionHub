@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useNavigate } from "react-router";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useNavigate,
+  Link,
+} from "react-router";
 import "./app.css";
 
-export function links() {
-  return [
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-    { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" },
-  ];
-}
+const slugify = (label: string) =>
+  label
+    .toString()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .toLowerCase();
 
 function MegaPanel({
   open,
@@ -42,18 +52,21 @@ function MegaPanel({
   );
 }
 
-function Col({ title, items }: { title: string; items: string[] }) {
+function Col({ title, items, basePath }: { title: string; items: string[]; basePath: string }) {
   return (
     <div>
       <h3 className="font-semibold uppercase tracking-wide mb-3">{title}</h3>
       <ul className="space-y-2 text-[#2e3850]">
-        {items.map((t) => (
-          <li key={t}>
-            <a className="hover:text-black" href="#">
-              {t}
-            </a>
-          </li>
-        ))}
+        {items.map((label) => {
+          const href = `${basePath}/${slugify(label)}`;
+          return (
+            <li key={href}>
+              <Link className="hover:text-black" to={href} prefetch="intent">
+                {label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -74,7 +87,12 @@ function Header() {
   return (
     <header className="relative bg-[#FAF5EB] border-b border-black/20">
       <div className="h-16 w-full pr-4 grid grid-cols-3 items-center">
-        <a className="justify-self-start pl-5 font-serif text-2xl tracking-[0.18em] cursor-pointer" onClick={() => navigate("/")}>FashionHub</a>
+        <a
+          className="justify-self-start pl-5 font-serif text-2xl tracking-[0.18em] cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          FashionHub
+        </a>
 
         <nav className="justify-self-center flex items-center gap-10 text-2xl uppercase tracking-[0.2em] font-serif">
           <div
@@ -82,7 +100,13 @@ function Header() {
             onFocus={() => setActive("mees")}
             onBlur={() => setActive(null)}
           >
-            <button className="outline-none cursor-pointer" aria-haspopup="true" aria-expanded={active === "mees"} type="button" onClick={() => navigate("/mees")}>
+            <button
+              className="outline-none cursor-pointer"
+              aria-haspopup="true"
+              aria-expanded={active === "mees"}
+              type="button"
+              onClick={() => navigate("/mees")}
+            >
               Mees
             </button>
           </div>
@@ -92,7 +116,13 @@ function Header() {
             onFocus={() => setActive("naiste")}
             onBlur={() => setActive(null)}
           >
-            <button className="outline-none cursor-pointer" aria-haspopup="true" aria-expanded={active === "naiste"} type="button" onClick={() => navigate("/naiste")}>
+            <button
+              className="outline-none cursor-pointer"
+              aria-haspopup="true"
+              aria-expanded={active === "naiste"}
+              type="button"
+              onClick={() => navigate("/naiste")}
+            >
               Naiste
             </button>
           </div>
@@ -109,13 +139,10 @@ function Header() {
         </div>
       </div>
 
-      <MegaPanel
-        open={active === "mees"}
-        onEnter={() => setActive("mees")}
-        onLeave={() => setActive(null)}
-      >
+      <MegaPanel open={active === "mees"} onEnter={() => setActive("mees")} onLeave={() => setActive(null)}>
         <Col
           title="Riided"
+          basePath="/mees/riided"
           items={[
             "HITT",
             "HOT DROP",
@@ -138,10 +165,12 @@ function Header() {
         />
         <Col
           title="Jalatsid"
+          basePath="/mees/jalatsid"
           items={["Vaata kõiki", "Tennised", "Jalatsid, Espadrillid", "Snow boots", "Sussid", "Spordijalatsid"]}
         />
         <Col
           title="Aksessuaarid"
+          basePath="/mees/aksessuaarid"
           items={[
             "Vaata kõiki",
             "Kotid, seljakotid",
@@ -162,24 +191,45 @@ function Header() {
             "Ujumisriided",
           ]}
         />
-        <Col title="Litsents" items={["Vaata kõiki", "League of Legends", "Music", "Gamer", "Cartoons", "Disney", "Hello Kitty"]} />
+        <Col
+          title="Litsents"
+          basePath="/mees/litsents"
+          items={["Vaata kõiki", "League of Legends", "Music", "Gamer", "Cartoons", "Disney", "Hello Kitty"]}
+        />
       </MegaPanel>
 
-      <MegaPanel
-        open={active === "naiste"}
-        onEnter={() => setActive("naiste")}
-        onLeave={() => setActive(null)}
-      >
+      <MegaPanel open={active === "naiste"} onEnter={() => setActive("naiste")} onLeave={() => setActive(null)}>
         <Col
           title="Riided"
+          basePath="/naiste/riided"
           items={["Uued", "Kleitid", "Pluusid", "Sviitrid", "Püksid", "T-särgid, topid", "Jakid & Mantlid", "Komplektid", "Seelikud", "Sport", "Basic"]}
         />
-        <Col title="Jalatsid" items={["Kõik jalatsid", "Ketsid", "Kontsakingad", "Saapad", "Ballerinad", "Sandaalid"]} />
-        <Col title="Aksessuaarid" items={["Kõik aksessuaarid", "Kotid", "Ehted", "Peakatteid", "Vööd", "Sokid & Sukad", "Ujumisriided"]} />
-        <Col title="Brändid/Litsents" items={["Disney", "Barbie", "Hello Kitty", "Anime", "TV & Movies", "Music"]} />
+        <Col
+          title="Jalatsid"
+          basePath="/naiste/jalatsid"
+          items={["Kõik jalatsid", "Ketsid", "Kontsakingad", "Saapad", "Ballerinad", "Sandaalid"]}
+        />
+        <Col
+          title="Aksessuaarid"
+          basePath="/naiste/aksessuaarid"
+          items={["Kõik aksessuaarid", "Kotid", "Ehted", "Peakatteid", "Vööd", "Sokid & Sukad", "Ujumisriided"]}
+        />
+        <Col
+          title="Brändid/Litsents"
+          basePath="/naiste/litsents"
+          items={["Disney", "Barbie", "Hello Kitty", "Anime", "TV & Movies", "Music"]}
+        />
       </MegaPanel>
     </header>
   );
+}
+
+export function links() {
+  return [
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+    { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" },
+  ];
 }
 
 export function Layout() {
