@@ -1,9 +1,15 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:5173"); // твой фронтовый origin
+// Всегда отправляем CORS заголовки
+header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+
+// Обработка preflight - ВАЖНО: делаем это ДО session_start()
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+  http_response_code(200);
+  exit;
+}
 
 session_name('FASHIONHUBSESSID');
 session_start();
@@ -30,6 +36,6 @@ function pdo() {
     ]);
     return $pdo;
   } catch (Throwable $e) {
-    json_response(['error' => 'DB connection failed'], 500);
+    json_response(['error' => 'DB connection failed: ' . $e->getMessage()], 500);
   }
 }

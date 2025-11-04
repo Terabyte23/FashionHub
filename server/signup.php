@@ -2,7 +2,7 @@
 require __DIR__.'/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-  json_response(['error' => 'Only POST allowed'], 405);
+  json_response(['status'=>'error','message'=>'Only POST allowed'], 405);
 }
 
 $data = json_decode(file_get_contents('php://input'), true) ?: [];
