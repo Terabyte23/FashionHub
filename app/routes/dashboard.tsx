@@ -2,26 +2,35 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useEffect } from "react";
-
+ 
 export default function Dashboard() {
-  const { user, logout, isAuthenticated } = useAuth();
+ 
   const { favorites, cartItems } = useCart();
   const navigate = useNavigate();
-
+ 
+  const { user, logout, isAuthenticated, isLoading } = useAuth();
+ 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       navigate("/login");
     }
-  }, [isAuthenticated, navigate]);
-
+  }, [isLoading, isAuthenticated, navigate]);
+ 
+  if (isLoading) {
+    return (
+      <main className="min-h-[calc(100vh-65px)] grid place-items-center">
+        <div>Loading...</div>
+      </main>
+    );
+  }
+ 
+  if (!user) {
+    return null;
+  }
   const handleLogout = () => {
     logout();
     navigate("/");
   };
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <main className="min-h-[calc(100vh-65px)] bg-gradient-to-br from-[#FAF5EB] to-[#E8DCC8] px-4 py-8">
@@ -84,7 +93,7 @@ export default function Dashboard() {
               </div>
             </div>
             <button
-              onClick={() => navigate("/cart")}
+              onClick={() => navigate("/cart?tab=cart")}
               className="mt-4 w-full py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
               View Cart
@@ -98,7 +107,7 @@ export default function Dashboard() {
                 <svg
                   className="w-8 h-8 text-white"
                   fill="currentColor"
-                  viewBox="0 0 24 24"
+                  viewBox="0 0 24 20"
                 >
                   <path
                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.93 0-3.64 1.126-4.312 2.733-.672-1.607-2.382-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 11.25 9 11.25s9-4.03 9-11.25z"
@@ -116,7 +125,7 @@ export default function Dashboard() {
               </div>
             </div>
             <button
-              onClick={() => navigate("/cart")}
+              onClick={() => navigate("/cart?tab=favorites")}
               className="mt-4 w-full py-2 px-4 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
             >
               View Favorites
@@ -151,25 +160,6 @@ export default function Dashboard() {
               className="mt-4 w-full py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             >
               Logout
-            </button>
-          </div>
-        </div>
-
-        
-        <div className="mt-8 bg-white/80 backdrop-blur rounded-xl border border-black/10 p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-            <button
-              onClick={() => navigate("/orders")}
-              className="py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-center"
-            >
-              My Orders
-            </button>
-            <button
-              onClick={() => navigate("/")}
-              className="py-3 px-4 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-center"
-            >
-              Back to Home
             </button>
           </div>
         </div>

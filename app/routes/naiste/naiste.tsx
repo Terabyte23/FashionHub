@@ -8,10 +8,10 @@ import type { Product } from "../../context/CartContext";
 type Item = { id: string; title: string; price: string; src: string };
 
 const items: Item[] = [
-  { id: "5", title: "Šerpa jope", price: "36,99 EUR", src: "/icon/image-8.png" },
-  { id: "6", title: "Lühike kapuutsiga bomber-jakk", price: "54,99 EUR", src: "/icon/image-9.png" },
-  { id: "7", title: "Teksapüksid baggy", price: "43,99 EUR", src: "/icon/image-10.png" },
-  { id: "8", title: "Ruuduline miniseelik", price: "29,99 EUR", src: "/icon/image-11.png" },
+  { id: "5", title: "Šerpa jope", price: "36.99 EUR", src: "/icon/image-8.png" },
+  { id: "6", title: "Lühike kapuutsiga bomber-jakk", price: "54.99 EUR", src: "/icon/image-9.png" },
+  { id: "7", title: "Teksapüksid baggy", price: "43.99 EUR", src: "/icon/image-10.png" },
+  { id: "8", title: "Ruuduline miniseelik", price: "29.99 EUR", src: "/icon/image-11.png" },
 ];
 
 const womenProducts = sampleProducts.filter(p => p.category === "naiste");

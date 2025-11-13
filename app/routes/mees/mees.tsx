@@ -8,10 +8,10 @@ import type { Product } from "../../context/CartContext";
 type Item = { id: string; title: string; price: string; src: string };
 
 const items: Item[] = [
-  { id: "1", title: "BALLOON FIT BAGGY-LÕIKEGA TEKSAPÜKSID", price: "36,99 EUR", src: "/icon/image-4.png" },
-  { id: "2", title: "BOMBER JAKK", price: "50,99 EUR", src: "/icon/image-5.png" },
-  { id: "3", title: "FLIISJAKK", price: "48,99 EUR", src: "/icon/image-6.png" },
-  { id: "4", title: "SPORTLIK JAKK", price: "62,99 EUR", src: "/icon/image-7.png" },
+  { id: "1", title: "BALLOON FIT BAGGY-LÕIKEGA TEKSAPÜKSID", price: "36.99 EUR", src: "/icon/image-4.png" },
+  { id: "2", title: "BOMBER JAKK", price: "50.99 EUR", src: "/icon/image-5.png" },
+  { id: "3", title: "FLIISJAKK", price: "48.99 EUR", src: "/icon/image-6.png" },
+  { id: "4", title: "SPORTLIK JAKK", price: "62.99 EUR", src: "/icon/image-7.png" },
 ];
 
 const menProducts = sampleProducts.filter(p => p.category === "mees");

@@ -278,10 +278,12 @@ export default function Profile() {
               Shopping Summary
             </h2>
             <div className="space-y-3">
-              <div className="flex justify_between items-center">
+              <div className="flex justify-between items-center">
                 <p className="text-gray-600">Current Cart Value</p>
                 <p className="text-xl font-bold text-green-600">{totalSpent.toFixed(2)} EUR</p>
-              </div>
+            </div>
+ 
+
               <div className="flex justify-between items-center">
                 <p className="text-gray-600">Items in Cart</p>
                 <p className="text-xl font-bold text-gray-800">{cartItems.length}</p>
@@ -302,13 +304,8 @@ export default function Profile() {
 
         <div className="mt-6 bg-white/80 backdrop-blur rounded-xl border border-black/10 p-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Account Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button
-              onClick={() => navigate("/orders")}
-              className="py-3 px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition text-center font-semibold"
-            >
-              View Order History
-            </button>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-xl mx-auto">
             <button
               onClick={() => navigate("/cart")}
               className="py-3 px-4 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition text-center font-semibold"

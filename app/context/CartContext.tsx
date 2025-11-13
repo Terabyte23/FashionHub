@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-
+import { useAuth } from "./AuthContext";
+ 
 export interface Product {
   id: string;
   name: string;
@@ -9,12 +10,12 @@ export interface Product {
   category: string;
   availableSizes: string[];
 }
-
+ 
 export interface CartItem extends Product {
   quantity: number;
   selectedSize: string;
 }
-
+ 
 interface CartContextType {
   favorites: Product[];
   cartItems: CartItem[];
@@ -28,42 +29,61 @@ interface CartContextType {
   clearCart: () => void;
   getTotalPrice: () => number;
 }
-
+ 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-
+ 
+// Вспомогательные функции для ключей
+const getFavoritesKey = (userId: number | null) =>
+  userId ? `favorites_${userId}` : "favorites_guest";
+ 
+const getCartKey = (userId: number | null) =>
+  userId ? `cart_${userId}` : "cart_guest";
+ 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const userId = user ? user.id : null;
+ 
   const [favorites, setFavorites] = useState<Product[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
+ 
+  // Загружаем корзину/избранное каждый раз, когда меняется пользователь
   useEffect(() => {
-    const storedFavorites = localStorage.getItem("favorites");
-    const storedCart = localStorage.getItem("cart");
-
-    if (storedFavorites) {
-      try {
-        setFavorites(JSON.parse(storedFavorites));
-      } catch (e) {
-        console.error("Error loading favorites:", e);
-      }
+    const favKey = getFavoritesKey(userId);
+    const cartKey = getCartKey(userId);
+ 
+    try {
+      const storedFavorites = localStorage.getItem(favKey);
+      const storedCart = localStorage.getItem(cartKey);
+ 
+      setFavorites(storedFavorites ? JSON.parse(storedFavorites) : []);
+      setCartItems(storedCart ? JSON.parse(storedCart) : []);
+    } catch (e) {
+      console.error("Error loading cart/favorites from localStorage:", e);
+      setFavorites([]);
+      setCartItems([]);
     }
-
-    if (storedCart) {
-      try {
-        setCartItems(JSON.parse(storedCart));
-      } catch (e) {
-        console.error("Error loading cart:", e);
-      }
+  }, [userId]);
+ 
+  // Сохраняем избранное в localStorage для текущего пользователя
+  useEffect(() => {
+    const favKey = getFavoritesKey(userId);
+    try {
+      localStorage.setItem(favKey, JSON.stringify(favorites));
+    } catch (e) {
+      console.error("Error saving favorites:", e);
     }
-  }, []);
-
+  }, [favorites, userId]);
+ 
+  // Сохраняем корзину в localStorage для текущего пользователя
   useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
-
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
-
+    const cartKey = getCartKey(userId);
+    try {
+      localStorage.setItem(cartKey, JSON.stringify(cartItems));
+    } catch (e) {
+      console.error("Error saving cart:", e);
+    }
+  }, [cartItems, userId]);
+ 
   const addToFavorites = (product: Product) => {
     setFavorites((prev) => {
       if (prev.some((item) => item.id === product.id)) {
@@ -72,21 +92,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return [...prev, product];
     });
   };
-
+ 
   const removeFromFavorites = (productId: string) => {
     setFavorites((prev) => prev.filter((item) => item.id !== productId));
   };
-
+ 
   const isFavorite = (productId: string) => {
     return favorites.some((item) => item.id === productId);
   };
-
+ 
   const addToCart = (product: Product, size: string, quantity: number) => {
     setCartItems((prev) => {
       const existingItem = prev.find(
         (item) => item.id === product.id && item.selectedSize === size
       );
-
+ 
       if (existingItem) {
         return prev.map((item) =>
           item.id === product.id && item.selectedSize === size
@@ -94,23 +114,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
             : item
         );
       }
-
+ 
       return [...prev, { ...product, selectedSize: size, quantity }];
     });
   };
-
+ 
   const removeFromCart = (productId: string, size: string) => {
     setCartItems((prev) =>
       prev.filter((item) => !(item.id === productId && item.selectedSize === size))
     );
   };
-
+ 
   const updateCartItemQuantity = (productId: string, size: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(productId, size);
       return;
     }
-
+ 
     setCartItems((prev) =>
       prev.map((item) =>
         item.id === productId && item.selectedSize === size
@@ -119,7 +139,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       )
     );
   };
-
+ 
   const updateCartItemSize = (productId: string, oldSize: string, newSize: string) => {
     setCartItems((prev) =>
       prev.map((item) =>
@@ -129,17 +149,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       )
     );
   };
-
+ 
   const clearCart = () => {
     setCartItems([]);
   };
-
+ 
   const getTotalPrice = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };
-
+ 
   return (
-    <CartContext.Provider
+<CartContext.Provider
       value={{
         favorites,
         cartItems,
@@ -153,12 +173,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         getTotalPrice,
       }}
-    >
+>
       {children}
-    </CartContext.Provider>
+</CartContext.Provider>
   );
 }
-
+ 
 export function useCart() {
   const context = useContext(CartContext);
   if (context === undefined) {
